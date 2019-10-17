@@ -1,0 +1,115 @@
+<html>
+<head>
+<title>Mathematics Exercise</title>
+<style>
+input[type="button"] {
+	background-color: #DAF7A6;
+	width: 150px;
+	height: 40px;
+	font-size: 16px;
+}
+input[type="text"] {
+	font-size: 16px;
+}
+label {
+	font-size: 24px;
+}
+.odd {
+	background-color: #DEDEDE;
+}
+.even {
+	background-color: white;
+}
+</style>
+</head>
+<body>
+	<table width="80%">
+		<tr><td>
+			<label>1. Choose a Dictionary File: </label><input type="file" id="fileinput"/>
+		</td></tr>
+		<tr><td>
+			<label>2. Number of Question: </label><input type="text" id="noQuestion" value="20"/>
+		</td></tr>
+		<tr><td>
+			<input type="button" onclick="populate()" value="Start" width="100"/>&nbsp;<input type="button" onclick="check()" value="Check Answer" width="100"/>
+		</td></tr>
+		<tr><td>
+			<table id="testTable" border="1" width="100%"></table>
+		</td></tr>
+	</table>
+
+	<script>
+		var shuffledPool;
+		document.getElementById('fileinput').onchange = function() {
+			var file = this.files[0];
+
+			var reader = new FileReader();
+			reader.onload = function(progressEvent) {
+				// By lines
+				var allLines = this.result.split('\n');
+
+				shuffledPool = shuffle(allLines);
+			};
+			reader.readAsText(file);
+		}
+		function shuffle(array) {
+			var currentValue = array.length, temporaryValue, randomIndex;
+
+			// While there remain elements to shuffle...
+			while (0 !== currentValue) {
+
+				// Pick a remaining element...
+				randomIndex = Math.floor(Math.random() * currentValue);
+				currentValue -= 1;
+
+				// And swap it with the current element.
+				temporaryValue = array[currentValue];
+				array[currentValue] = array[randomIndex];
+				array[randomIndex] = temporaryValue;
+			}
+
+			return array;
+		}
+		function populate() {
+			var testTable = document.getElementById('testTable')
+			var noQuestion = document.getElementById('noQuestion').value
+			var htmlString = []
+			for(var i=0 ; i<noQuestion ; i++) {
+				var question = shuffledPool[i].split(',')[0]
+				var answer = shuffledPool[i].split(',')[1]
+				htmlString.push("&nbsp;<label>"+question+"</label><input id=\"testAnswer["+i+"]\" type=\"text\" size=\"5\"/>&nbsp;<input id=\"realAnswer["+i+"]\" type=\"text\" value=\""+answer+"\" size=\"3\" style=\"display:none\"/><img id=\"correct["+i+"]\" src='smiley.png' height='20' width='20' style='display:none'/><img id=\"wrong["+i+"]\" src='sad.png' height='20' width='20' style='display:none'/>")
+			}
+			var cssClass = 'odd'
+			while(htmlString.length != 0) {
+				var row = testTable.insertRow(0)
+				if(cssClass === 'odd') {
+					cssClass = 'even'
+					row.classList.add(cssClass)
+				} else {
+					cssClass = 'odd'
+					row.classList.add(cssClass)
+				}
+				var cell0 = row.insertCell(0)
+				cell0.innerHTML = htmlString.pop()
+
+				var cell1 = row.insertCell(0)
+				cell1.innerHTML = htmlString.pop()
+			}
+		}
+		function check() {
+			var noQuestion = document.getElementById('noQuestion').value
+			for(var i=0 ; i<noQuestion ; i++) {
+				var realAnswerValue = document.getElementById("realAnswer["+i+"]").value
+				var testAnswerValue = document.getElementById("testAnswer["+i+"]").value
+				if(testAnswerValue === realAnswerValue) {
+					document.getElementById("correct["+i+"]").style.display = 'inline'
+					document.getElementById("wrong["+i+"]").style.display = 'none'
+				} else {
+					document.getElementById("correct["+i+"]").style.display = 'none'
+					document.getElementById("wrong["+i+"]").style.display = 'inline'
+				}
+			}
+		}
+	</script>
+</body>
+</html>
